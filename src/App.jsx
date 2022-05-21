@@ -30,6 +30,7 @@ class App extends React.Component {
             <Route path="/" element={<Home />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/singleProduct/:id" element={<SingleProduct />} />
+            <Route path="cart/singleProduct/:id" element={<SingleProduct />} />
           </Routes>
         </Router>) : <h1 className="center" style={{marginTop:'5rem'}}>Error 404, Please Try again.</h1>}
       </>

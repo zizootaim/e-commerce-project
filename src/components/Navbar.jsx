@@ -8,6 +8,7 @@ import { GET_CURRENCIES } from "../GraphQl/Queries";
 import { withRouter } from "./SingleProduct/withRouter";
 import { showCart, getTotal } from "../Redux/CommonFunctions";
 import Attributes from "./Attributes";
+import { Link } from "react-router-dom";
 
 class Navbar extends React.Component {
   state = {
@@ -104,6 +105,7 @@ class Navbar extends React.Component {
             </div>
             <div className="mini__cart__wrapper flex">
               <div className="cart__img">
+                <span>{cartProducts.length}</span>
                 <img
                   src={cartImg}
                   alt="cart icon"
@@ -144,7 +146,9 @@ class Navbar extends React.Component {
                               </button>
                             </div>
                             <div className="cart__item__img">
-                              <img src={p.gallery[0]} alt="pro" />
+                              <Link to={`/cart/SingleProduct/${p.id}`}>
+                                <img src={p.gallery[0]} alt="pro" />
+                              </Link>
                             </div>
                           </div>
                         );
@@ -163,6 +167,7 @@ class Navbar extends React.Component {
                         <button
                           className="secondary__btn main__btn"
                           onClick={() => {
+                            showCart(false)
                             this.props.navigate("/cart");
                           }}
                         >
@@ -173,7 +178,9 @@ class Navbar extends React.Component {
                     </div>
                   </>
                 ) : (
-                  <h1 className="center" style={{padding:'2rem 0'}}>Your Cart is Empty.</h1>
+                  <h1 className="center" style={{ padding: "2rem 0" }}>
+                    Your Cart is Empty.
+                  </h1>
                 )}
               </div>
             </div>

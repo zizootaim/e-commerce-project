@@ -3,6 +3,9 @@ import "./Cart.css";
 import { connect } from "react-redux";
 import Attributes from "../Attributes";
 import { getTotal } from "../../Redux/CommonFunctions";
+import { Link } from "react-router-dom";
+
+
 class Cart extends React.Component {
   constructor(props) {
     super(props);
@@ -35,10 +38,9 @@ class Cart extends React.Component {
     const { changeAmount, cartProducts, currentCurrency } = this.props;
     return (
       <section className="cart" id="cart">
-    
         {cartProducts.length >= 1 ? (
           <div>
-                <h1>Cart</h1>
+            <h1>Cart</h1>
             <div className="cart__items flex">
               {cartProducts.map((p) => {
                 return (
@@ -64,21 +66,34 @@ class Cart extends React.Component {
                       </button>
                     </div>
                     <div className="item__slider" id={p.id}>
-                      <div className="slide__btns">
-                        <button
-                          onClick={(e) => this.moveSlider(e, p.id, false)}
-                        >
-                          <i className="fas fa-angle-left"></i>
-                        </button>
-                        <button onClick={(e) => this.moveSlider(e, p.id, true)}>
-                          <i className="fas fa-angle-right"></i>
-                        </button>
-                      </div>
+                      {p.gallery.length > 1 ? (
+                        <div className="slide__btns">
+                          <button
+                            onClick={(e) => this.moveSlider(e, p.id, false)}
+                          >
+                            <i className="fas fa-angle-left"></i>
+                          </button>
+                          <button
+                            onClick={(e) => this.moveSlider(e, p.id, true)}
+                          >
+                            <i className="fas fa-angle-right"></i>
+                          </button>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+
                       <div className="slides">
                         {p.gallery.map((img, index) => {
                           return (
                             <div className="slide" key={index}>
-                              <img src={img} alt="pro" />
+                              <Link to={`/cart/SingleProduct/${p.id}`}>
+                              <img
+                                src={img}
+                                alt="pro"
+                                style={{ cursor: "pointer" }}
+                              />
+                              </Link>
                             </div>
                           );
                         })}

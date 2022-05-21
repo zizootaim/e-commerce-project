@@ -16,6 +16,10 @@
   display: flex;
   justify-content: space-between;
   flex-direction: column;
+  gap: 1rem;
+}
+.item__data div p{
+  margin-bottom: .5rem;
 }
 .item__slider {
   width: 200px;

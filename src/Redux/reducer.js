@@ -45,16 +45,13 @@ const reducer = (state = initialState, action) => {
       const categories = payload.map((c) => c.name);
       let allProducts = [];
       payload.forEach((c) => {
-        allProducts = [...allProducts, ...c.products];
+        allProducts = [...allProducts, ...c.products].map((p) => {
+          return { ...p, isAttributesChanged: false };
+        });
       });
 
       allProducts = changeProductsPrices(allProducts, state.currentCurrency);
-allProducts.forEach(p =>{
-  if(p.inStock == false){
-    console.log(p);
-  }
-  
-})
+
       return {
         ...state,
         categories,
@@ -63,7 +60,6 @@ allProducts.forEach(p =>{
       };
     }
     case FILTER__PRODUCTS: {
-      console.log(payload);
       let newProducts = changeProductsPrices(
         state.products,
         state.currentCurrency
@@ -89,18 +85,36 @@ allProducts.forEach(p =>{
       };
     }
     case ADD_TO_CART: {
-      if (state.cartProducts.find((p) => p.id === payload.id)) {
+      const old = state.cartProducts.filter((p) => p.prevID == payload.id || p.prevID == payload.id);
+
+      if (old[old.length - 1] && !old[old.length - 1].isAttributesChanged)
         return state;
+      let newItem = { ...payload };
+      if (!payload.inCart) {
+        payload.attributes = payload.attributes.map((attr) => {
+          const newItems = attr.items.map((i, index) => {
+            if (index == 0) {
+              return { ...i, selected: true };
+            }
+            return i;
+          });
+          return { ...attr, items: newItems };
+        });
+        newItem = {
+          ...payload,
+          id: payload.id + Math.random(),
+          prevID: payload.id,
+        };
       }
-      const newCartProducts = [...state.cartProducts, payload].map((p) => {
+
+      const newCartProducts = [...state.cartProducts, newItem].map((p) => {
         return {
           ...p,
+          inCart: true,
           count: 1,
           total: extractNumber(p.price),
-          choosenAttributes: [],
         };
       });
-
       return {
         ...state,
         cartProducts: newCartProducts,
@@ -126,15 +140,10 @@ allProducts.forEach(p =>{
       };
     }
     case CHANGE_ATTRIBUTES: {
+      console.log(state.cartProducts);
+
       const newCartProducts = state.cartProducts.map((pro) => {
         if (pro.id === payload.productID) {
-          const newAttr = {
-            id: payload.attrID,
-            value: payload.value,
-            changed: false,
-          };
-          console.log(payload);
-          console.log(pro);
           let attributes = pro.attributes.map((a) => {
             if (a.id == payload.attr.id) {
               const newItems = a.items.map((i) => {
@@ -147,14 +156,16 @@ allProducts.forEach(p =>{
             }
             return a;
           });
-      
+
           return {
             ...pro,
             attributes,
+            isAttributesChanged: true,
           };
         }
         return pro;
       });
+      console.log(newCartProducts);
       return {
         ...state,
         cartProducts: changeProductsPrices(

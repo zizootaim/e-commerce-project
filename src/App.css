@@ -154,7 +154,18 @@ nav {
 .nav .cart__img {
   width: 1.6rem;
   height: 1.3rem;
+  position: relative;
   cursor: pointer;
+}
+.cart__img span{
+  position: absolute;
+  top: -.2rem;
+  right: 0rem;
+  background: var(--black-color);
+  padding: .1rem .2rem;
+  color: #fff;
+  border-radius: 50%;
+  font-size: .6rem;
 }
 .mini__cart {
   position: absolute;

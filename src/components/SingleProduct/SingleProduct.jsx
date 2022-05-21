@@ -6,6 +6,9 @@ import Attributes from "../Attributes";
 import { showCart } from "../../Redux/CommonFunctions";
 
 class SingleProduct extends React.Component {
+  state = {
+    id: "",
+  };
   changeMainImg(e) {
     const newImg = e.target.src;
     e.target.src = document.querySelector(".main__img img").src;
@@ -18,10 +21,12 @@ class SingleProduct extends React.Component {
   render() {
     const id = this.props.params.id;
     let product = this.props.products.find((pro) => pro.id === id);
-    const producInCart = this.props.cartProducts.find((pro) => pro.id == id);
-    if (producInCart) product = producInCart;
+    if (this.props.location.pathname.includes("cart")) {
+      product = this.props.cartProducts.find((pro) => pro.id == id);
+    }
 
-    return product.id ? (
+    // console.log(product);
+    return product ? (
       <section className="single__product">
         <div className="product__imgs">
           <div className="small__imgs">
@@ -51,20 +56,26 @@ class SingleProduct extends React.Component {
 
           <p>Price:</p>
           <div className="price">{product.price}</div>
-          <button
-            className="main__btn"
-            onClick={() => {
-              showCart(false);
-              this.props.addToCart(product);
-            }}
-          >
-            add to cart
-          </button>
+          {!product.inCart ? (
+            <button
+              className="main__btn"
+              onClick={() => {
+                showCart(false);
+                this.props.addToCart(product);
+              }}
+            >
+              add to cart
+            </button>
+          ) : (
+            ""
+          )}
           <p className="desc">{this.extractContent(product.description)}</p>
         </div>
       </section>
     ) : (
-      <p className="center">Error 404,Please Try again. </p>
+      <p className="center" style={{ marginTop: "5rem" }}>
+        Error 404,Please Try again.{" "}
+      </p>
     );
   }
 }
