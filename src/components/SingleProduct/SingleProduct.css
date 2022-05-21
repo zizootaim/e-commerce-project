@@ -48,6 +48,13 @@
 .desc {
   justify-self: flex-end;
 }
+.single__product.out-cart .attributes__wrapper{
+  pointer-events: none;
+}
+.single__product.out-cart .attributes__wrapper .attr.selected{
+  background: none;
+  color: #000;
+}
 
 .single__product .attributes__wrapper p {
   margin: 1rem 0;

@@ -6,9 +6,6 @@ import Attributes from "../Attributes";
 import { showCart } from "../../Redux/CommonFunctions";
 
 class SingleProduct extends React.Component {
-  state = {
-    id: "",
-  };
   changeMainImg(e) {
     const newImg = e.target.src;
     e.target.src = document.querySelector(".main__img img").src;
@@ -25,9 +22,9 @@ class SingleProduct extends React.Component {
       product = this.props.cartProducts.find((pro) => pro.id == id);
     }
 
-    // console.log(product);
+    
     return product ? (
-      <section className="single__product">
+      <section className={`${product.inCart ? 'single__product' : 'single__product out-cart'}`}>
         <div className="product__imgs">
           <div className="small__imgs">
             {product.gallery.slice(1).map((s, index) => {
@@ -74,7 +71,7 @@ class SingleProduct extends React.Component {
       </section>
     ) : (
       <p className="center" style={{ marginTop: "5rem" }}>
-        Error 404,Please Try again.{" "}
+        Error , Please Try again.{" "}
       </p>
     );
   }
