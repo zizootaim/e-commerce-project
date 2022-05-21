@@ -51,9 +51,11 @@
 .single__product.out-cart .attributes__wrapper{
   pointer-events: none;
 }
-.single__product.out-cart .attributes__wrapper .attr.selected{
+.single__product.out-cart .attributes__wrapper .attr.selected,.single__product.out-cart .attributes__wrapper .size.selected,
+.single__product.out-cart .attributes__wrapper .color.selected{
   background: none;
   color: #000;
+  box-shadow: none;
 }
 
 .single__product .attributes__wrapper p {
