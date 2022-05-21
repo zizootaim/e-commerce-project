@@ -14,7 +14,7 @@ class Home extends React.Component {
           {filteredProducts ? (
             filteredProducts.map((p, index) => {
               return (
-                <div className="product" key={index}>
+                <div className={`${p.inStock ? 'product' : 'product out-of-stock after'}`} key={index}>
                   <Link to={`SingleProduct/${p.id}`}>
                     <div className="product__img center">
                       <img src={p.gallery[0]} alt="img" />

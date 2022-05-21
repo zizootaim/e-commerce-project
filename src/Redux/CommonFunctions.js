@@ -15,5 +15,5 @@ export const  getTotal = (arr) =>{
   })
   const tax = t * (21/100);
 
-  return {total:t-tax,tax};
+  return {total:t,tax};
 }

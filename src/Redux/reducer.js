@@ -49,7 +49,12 @@ const reducer = (state = initialState, action) => {
       });
 
       allProducts = changeProductsPrices(allProducts, state.currentCurrency);
-
+allProducts.forEach(p =>{
+  if(p.inStock == false){
+    console.log(p);
+  }
+  
+})
       return {
         ...state,
         categories,
@@ -142,8 +147,7 @@ const reducer = (state = initialState, action) => {
             }
             return a;
           });
-          console.log(attributes);
-          console.log();
+      
           return {
             ...pro,
             attributes,
