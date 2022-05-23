@@ -1,4 +1,4 @@
-export const showCart = (close) => {
+export const showCart = () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
   document.querySelector(".mini__cart").classList.toggle("show");
   document.body.classList.toggle("overlay");

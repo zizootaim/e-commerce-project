@@ -22,9 +22,12 @@ class SingleProduct extends React.Component {
       product = this.props.cartProducts.find((pro) => pro.id == id);
     }
 
-    
     return product ? (
-      <section className={`${product.inCart ? 'single__product' : 'single__product out-cart'}`}>
+      <section
+        className={`${
+          product.inCart ? "single__product" : "single__product out-cart"
+        }`}
+      >
         <div className="product__imgs">
           <div className="small__imgs">
             {product.gallery.slice(1).map((s, index) => {
@@ -57,8 +60,13 @@ class SingleProduct extends React.Component {
             <button
               className="main__btn"
               onClick={() => {
-                showCart(false);
-                this.props.addToCart(product);
+                showCart();
+                if (this.props.addedProduct.isAttributesChanged) {
+                  console.log(this.props.addedProduct, "hhhhhh");
+                  this.props.addToCart(this.props.addedProduct);
+                } else {
+                  this.props.addToCart(product);
+                }
               }}
             >
               add to cart
@@ -80,6 +88,7 @@ const mapStateToProps = (state) => {
   return {
     products: state.products,
     cartProducts: state.cartProducts,
+    addedProduct: state.addedProduct,
   };
 };
 const mapDispatchToProps = (dispatch) => {

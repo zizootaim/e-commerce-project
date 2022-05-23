@@ -4,6 +4,17 @@ import { connect } from "react-redux";
 class Attributes extends React.Component {
   render() {
     const chooseAttr = (e, attr, attrItem) => {
+      const existed = this.props.cartProducts.find(
+        (p) => p.id == this.props.productID
+      )
+        ? true
+        : false;
+      if (!existed) {
+        Array.from(e.target.parentElement.children).forEach((s) => {
+          s.classList.remove("selected");
+        });
+        e.target.classList.add("selected");
+      }
       this.props.changeAttribute(this.props.productID, attr, attrItem);
     };
 
@@ -70,6 +81,13 @@ class Attributes extends React.Component {
   }
 }
 
+const mapStateToProps = (state) => {
+  return {
+    products: state.products,
+    cartProducts: state.cartProducts,
+    addedProduct: state.addedProduct,
+  };
+};
 const mapDispatchToProps = (dispatch) => {
   return {
     changeAttribute: (productID, attr, attrItem) => {
@@ -80,4 +98,4 @@ const mapDispatchToProps = (dispatch) => {
     },
   };
 };
-export default connect(null, mapDispatchToProps)(Attributes);
+export default connect(mapStateToProps, mapDispatchToProps)(Attributes);

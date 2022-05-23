@@ -28,7 +28,7 @@ class Navbar extends React.Component {
     e.target.classList.toggle("active");
   }
 
-  showCurrenciesList(e, close) {
+  showCurrenciesList(e) {
     // Close Mini Cart
     document.querySelector(".mini__cart").classList.remove("show");
     document.body.classList.remove("overlay");
@@ -85,7 +85,7 @@ class Navbar extends React.Component {
                 <span>{currentCurrency.symbol}</span>
                 <i
                   className="fas fa-angle-down"
-                  onClick={(e) => this.showCurrenciesList(e, false)}
+                  onClick={(e) => this.showCurrenciesList(e)}
                 ></i>
               </div>
               <ul className="currencies__list">
@@ -109,7 +109,7 @@ class Navbar extends React.Component {
                 <img
                   src={cartImg}
                   alt="cart icon"
-                  onClick={() => showCart(false)}
+                  onClick={() => showCart()}
                 />
               </div>
               <div className="mini__cart">
@@ -167,7 +167,7 @@ class Navbar extends React.Component {
                         <button
                           className="secondary__btn main__btn"
                           onClick={() => {
-                            showCart(false)
+                            showCart()
                             this.props.navigate("/cart");
                           }}
                         >

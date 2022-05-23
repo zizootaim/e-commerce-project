@@ -9,6 +9,7 @@ const initialState = {
     symbol: "$",
   },
   cartProducts: [],
+  addedProduct: {},
 };
 const FETCH_DATA = "FETCH_DATA";
 const ADD_TO_CART = "ADD_TO_CART";
@@ -16,6 +17,7 @@ const CHANGE_ATTRIBUTES = "CHANGE_ATTRIBUTES";
 const CHANGE_AMOUNT = "CHANGE_AMOUNT";
 const CHANGE_CURRENCY = "CHANGE_CURRENCY";
 const FILTER__PRODUCTS = "FILTER__PRODUCTS";
+const ADD_PROD = "ADD_PROD";
 
 const extractNumber = (str) => {
   var regex = /[+-]?\d+(\.\d+)?/g;
@@ -85,21 +87,25 @@ const reducer = (state = initialState, action) => {
       };
     }
     case ADD_TO_CART: {
-      const old = state.cartProducts.filter((p) => p.prevID == payload.id || p.prevID == payload.id);
-
+      const old = state.cartProducts.filter(
+        (p) => p.prevID == payload.id || p.prevID == payload.id
+      );
       if (old[old.length - 1] && !old[old.length - 1].isAttributesChanged)
         return state;
       let newItem = { ...payload };
       if (!payload.inCart) {
-        payload.attributes = payload.attributes.map((attr) => {
-          const newItems = attr.items.map((i, index) => {
-            if (index == 0) {
-              return { ...i, selected: true };
-            }
-            return i;
+        if (!payload.isAttributesChanged) {
+          payload.attributes = payload.attributes.map((attr) => {
+            const newItems = attr.items.map((i, index) => {
+              if (index == 0) {
+                return { ...i, selected: true };
+              }
+              return i;
+            });
+            return { ...attr, items: newItems };
           });
-          return { ...attr, items: newItems };
-        });
+        }
+
         newItem = {
           ...payload,
           id: payload.id + Math.random(),
@@ -108,6 +114,7 @@ const reducer = (state = initialState, action) => {
       }
 
       const newCartProducts = [...state.cartProducts, newItem].map((p) => {
+        console.log("hello", p);
         return {
           ...p,
           inCart: true,
@@ -118,9 +125,11 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         cartProducts: newCartProducts,
+        addedProduct: {},
       };
     }
     case CHANGE_AMOUNT: {
+      console.log(state.cartProducts);
       const newCartProducts = state.cartProducts
         .map((pro) => {
           if (pro.id === payload.id) {
@@ -140,8 +149,37 @@ const reducer = (state = initialState, action) => {
       };
     }
     case CHANGE_ATTRIBUTES: {
-      console.log(state.cartProducts);
+      const existed = state.cartProducts.find((p) => p.id == payload.productID)
+        ? true
+        : false;
+      if (!existed) {
+        let newPro = state.products.find((p) => p.id == payload.productID);
+        if (state.addedProduct.isAttributesChanged) {
+          newPro = state.addedProduct;
+        }
+        console.log(newPro);
+        let attributes = newPro.attributes.map((a) => {
+          if (a.id == payload.attr.id) {
+            const newItems = a.items.map((i) => {
+              let selected = false;
 
+              if (i.id == payload.attrItem.id) selected = true;
+              return { ...i, selected };
+            });
+            return { ...a, items: newItems };
+          }
+          return a;
+        });
+        console.log(newPro.attributes);
+        return {
+          ...state,
+          addedProduct: {
+            ...newPro,
+            attributes,
+            isAttributesChanged: true,
+          },
+        };
+      }
       const newCartProducts = state.cartProducts.map((pro) => {
         if (pro.id === payload.productID) {
           let attributes = pro.attributes.map((a) => {
