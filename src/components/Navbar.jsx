@@ -1,12 +1,12 @@
 import React from "react";
 import shoopingBag from "../assets/shopping.png";
-import cartImg from "../assets/shopping-cart.png";
+import cartImg from "../assets/cartImg.svg";
 import { connect } from "react-redux";
 import "../App.css";
 import { graphql } from "@apollo/client/react/hoc";
 import { GET_CURRENCIES } from "../GraphQl/Queries";
 import { withRouter } from "./SingleProduct/withRouter";
-import { showCart, getTotal } from "../Redux/CommonFunctions";
+import { showCart, getTotal,showCurrenciesList,closeMenues,getQuantity } from "../Redux/CommonFunctions";
 import Attributes from "./Attributes";
 import { Link } from "react-router-dom";
 
@@ -28,100 +28,82 @@ class Navbar extends React.Component {
     e.target.classList.toggle("active");
   }
 
-  showCurrenciesList(e) {
-    // Close Mini Cart
-    document.querySelector(".mini__cart").classList.remove("show");
-    document.body.classList.remove("overlay");
-    // Open and Close Currencies List
-    let height = 0,
-      iconDir = "";
-
-    if (e.target.className == "fas fa-angle-down") iconDir = "up";
-    else iconDir = "down";
-    Array.from(document.querySelector(".currencies__list").children).forEach(
-      (li) => {
-        height += li.getBoundingClientRect().height;
-      }
-    );
-
-    if (iconDir == "down") height = 0;
-
-    e.target.className = `fas fa-angle-${iconDir}`;
-    document.querySelector(".currencies__list").style.height = height + "px";
-  }
+ 
 
   render() {
     const { categories, cartProducts, currentCurrency, changeAmount } =
       this.props;
+      const categoriesList = categories
+      ? categories.map((c, index) => {
+          return (
+            <li
+              className="after"
+              onClick={(e) => this.activateNavLink(e, c)}
+              key={index}
+            >
+              {c}
+            </li>
+          );
+        })
+      : "";
     const currencies = this.props.data.currencies;
+    const currenciesList = currencies
+    ? currencies.map((c, index) => (
+        <li
+          className="currency"
+          key={index}
+          onClick={() => {
+            showCurrenciesList();
+            this.props.changeCurrency(c);
+          }}
+        >
+          {c.symbol}
+          {c.label}
+        </li>
+      ))
+    : ""
     return (
       <nav>
         <div className="nav">
-          <div className="nav__categories">
+          <div className="nav__categories" onClick={closeMenues}>
             <ul>
-              {categories
-                ? categories.map((c, index) => {
-                    return (
-                      <li
-                        className="after"
-                        onClick={(e) => this.activateNavLink(e, c)}
-                        key={index}
-                      >
-                        {c}
-                      </li>
-                    );
-                  })
-                : ""}
+              {categoriesList}
             </ul>
           </div>
-          <div className="nav__bag flex">
+          <div className="nav__bag flex" onClick={closeMenues}>
             <img className="bag__img" src={shoopingBag} alt="bag" />
 
-            {/* <i class="fas fa-redo"></i> */}
           </div>
           <div className="nav__right">
             <div className="currencies__list__wrapper">
-              <div className="currencies__list__top flex">
+              <div
+                className="currencies__list__top flex"
+                onClick={() => showCurrenciesList()}
+              >
                 <span>{currentCurrency.symbol}</span>
-                <i
-                  className="fas fa-angle-down"
-                  onClick={(e) => this.showCurrenciesList(e)}
-                ></i>
+                <i className="fas fa-angle-down"></i>
               </div>
               <ul className="currencies__list">
-                {currencies
-                  ? currencies.map((c, index) => (
-                      <li
-                        className="currency"
-                        key={index}
-                        onClick={() => this.props.changeCurrency(c)}
-                      >
-                        {c.symbol}
-                        {c.label}
-                      </li>
-                    ))
-                  : ""}
+                {currenciesList}
               </ul>
             </div>
             <div className="mini__cart__wrapper flex">
-              <div className="cart__img">
-                <span>{cartProducts.length}</span>
-                <img
-                  src={cartImg}
-                  alt="cart icon"
-                  onClick={() => showCart()}
-                />
+              <div className="cart__img" onClick={() => showCart()}>
+                <span className="center">{getQuantity(cartProducts)}</span>
+
+                <img src={cartImg} alt="cart icon"  />
               </div>
               <div className="mini__cart">
                 {cartProducts.length > 0 ? (
                   <>
-                    <h4>My Bag {cartProducts.length} items</h4>
+                    <h4>My Bag {getQuantity(cartProducts)} items</h4>
                     <div className="cart__items flex">
                       {cartProducts.map((p) => {
                         return (
                           <div className="cart__item" key={p.id}>
                             <div className="cart__item__data flex">
                               <p>{p.name}</p>
+                              <p> {p.brand}</p>
                               <span className="price">
                                 {currentCurrency.symbol + " " + p.total}
                               </span>
@@ -160,14 +142,14 @@ class Navbar extends React.Component {
                         <span>
                           {currentCurrency.symbol +
                             " " +
-                            getTotal(this.props.cartProducts).total}
+                            getTotal(this.props.cartProducts).total.toFixed(2)}
                         </span>
                       </h3>
                       <div className="cart__bottom__btns flex">
                         <button
                           className="secondary__btn main__btn"
                           onClick={() => {
-                            showCart()
+                            showCart();
                             this.props.navigate("/cart");
                           }}
                         >
@@ -178,9 +160,7 @@ class Navbar extends React.Component {
                     </div>
                   </>
                 ) : (
-                  <h1 className="center" style={{ padding: "2rem 0" }}>
-                    Your Cart is Empty.
-                  </h1>
+                  <h1 className="center">Your Cart is Empty.</h1>
                 )}
               </div>
             </div>

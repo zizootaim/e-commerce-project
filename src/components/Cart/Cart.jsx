@@ -2,7 +2,7 @@ import React from "react";
 import "./Cart.css";
 import { connect } from "react-redux";
 import Attributes from "../Attributes";
-import { getTotal } from "../../Redux/CommonFunctions";
+import { getTotal,getQuantity,closeMenues } from "../../Redux/CommonFunctions";
 import { Link } from "react-router-dom";
 
 
@@ -27,17 +27,11 @@ class Cart extends React.Component {
       this.slideNum * 200
     }px)`;
   }
-  getQuantity(arr) {
-    let q = 0;
-    arr.forEach((i) => {
-      q += i.count;
-    });
-    return q;
-  }
+  
   render() {
     const { changeAmount, cartProducts, currentCurrency } = this.props;
     return (
-      <section className="cart" id="cart">
+      <section className="cart" id="cart" onClick={closeMenues}>
         {cartProducts.length >= 1 ? (
           <div>
             <h1>Cart</h1>
@@ -47,6 +41,7 @@ class Cart extends React.Component {
                   <div className="item" key={p.id}>
                     <div className="item__data">
                       <h3 className="item__title">{p.name}</h3>
+                      <p>{p.brand}</p>
                       <div className="price">{p.price}</div>
                       <Attributes attributes={p.attributes} productID={p.id} />
                     </div>
@@ -107,17 +102,17 @@ class Cart extends React.Component {
               <div>
                 <p>Tax 21%:</p>
                 <span className="price">
-                  {currentCurrency.symbol + " " + getTotal(cartProducts).tax}
+                  {currentCurrency.symbol + " " + getTotal(cartProducts).tax.toFixed(2)}
                 </span>
               </div>
               <div>
                 <p>Quantity:</p>
-                <span className="price">{this.getQuantity(cartProducts)}</span>
+                <span className="price">{getQuantity(cartProducts)}</span>
               </div>
               <div>
                 <p>Total:</p>
                 <span className="price">
-                  {currentCurrency.symbol + " " + getTotal(cartProducts).total}
+                  {currentCurrency.symbol + " " + getTotal(cartProducts).total.toFixed(2)}
                 </span>
               </div>
               <button className="main__btn">order</button>

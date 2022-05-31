@@ -3,7 +3,7 @@ import "./SingleProduct.css";
 import { withRouter } from "./withRouter";
 import { connect } from "react-redux";
 import Attributes from "../Attributes";
-import { showCart } from "../../Redux/CommonFunctions";
+import { showCart,closeMenues } from "../../Redux/CommonFunctions";
 
 class SingleProduct extends React.Component {
   changeMainImg(e) {
@@ -21,12 +21,12 @@ class SingleProduct extends React.Component {
     if (this.props.location.pathname.includes("cart")) {
       product = this.props.cartProducts.find((pro) => pro.id == id);
     }
-
     return product ? (
       <section
         className={`${
-          product.inCart ? "single__product" : "single__product out-cart"
+          product.inStock ? "single__product" : "single__product out-of-stock after"
         }`}
+        onClick={closeMenues}
       >
         <div className="product__imgs">
           <div className="small__imgs">
@@ -41,12 +41,13 @@ class SingleProduct extends React.Component {
               );
             })}
           </div>
-          <div className="main__img center">
+          <div className="main__img ">
             <img src={product.gallery[0]} alt="img" />
           </div>
         </div>
         <div className="product__data">
           <h3 className="item__title">{product.name}</h3>
+          <h3 className="item__title">{product.brand}</h3>
           <div className="attributes__wrapper">
             <Attributes
               attributes={product.attributes}
@@ -74,7 +75,8 @@ class SingleProduct extends React.Component {
           ) : (
             ""
           )}
-          <p className="desc">{this.extractContent(product.description)}</p>
+          
+          <div className="desc" dangerouslySetInnerHTML={{ __html: product.description }}></div>
         </div>
       </section>
     ) : (

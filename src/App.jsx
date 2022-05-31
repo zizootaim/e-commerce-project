@@ -8,9 +8,9 @@ import Cart from "./components/Cart/Cart";
 import { connect } from "react-redux";
 import { graphql } from "@apollo/client/react/hoc";
 import { GET_DATA } from "./GraphQl/Queries";
+import { closeMenues } from "./Redux/CommonFunctions";
 
 class App extends React.Component {
-  
   componentDidUpdate() {
     const { data } = this.props;
     console.log(data);
@@ -19,20 +19,33 @@ class App extends React.Component {
     }
   }
   render() {
-    if(this.props.data.loading){
-      return <h1 className="center" style={{marginTop:'5rem'}}>Loading...</h1>
+    if (this.props.data.loading) {
+      return (
+        <h1 className="center mt-5">
+          Loading...
+        </h1>
+      );
     }
     return (
       <>
-        {!this.props.data.error ? (<Router>
-        <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/singleProduct/:id" element={<SingleProduct />} />
-            <Route path="cart/singleProduct/:id" element={<SingleProduct />} />
-          </Routes>
-        </Router>) : <h1 className="center" style={{marginTop:'5rem'}}>Error 404, Please Try again.</h1>}
+        {!this.props.data.error ? (
+            <Router>
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/singleProduct/:id" element={<SingleProduct />} />
+                <Route
+                  path="cart/singleProduct/:id"
+                  element={<SingleProduct />}
+                />
+              </Routes>
+            </Router>
+        ) : (
+          <h1 className="center mt-5">
+            Error 404, Please Try again.
+          </h1>
+        )}
       </>
     );
   }
