@@ -3,7 +3,7 @@ import "./SingleProduct.css";
 import { withRouter } from "./withRouter";
 import { connect } from "react-redux";
 import Attributes from "../Attributes";
-import { showCart, closeMenues } from "../../Redux/CommonFunctions";
+import {  closeMenues } from "../../Redux/CommonFunctions";
 import { GET_PRODUCT } from "../../GraphQl/Queries";
 import { withApollo } from "@apollo/client/react/hoc";
 
@@ -21,7 +21,7 @@ class SingleProduct extends React.Component {
       .textContent;
   }
   componentDidMount() {
-    showCart();
+    closeMenues()
     this.runQuery();
   }
   runQuery() {

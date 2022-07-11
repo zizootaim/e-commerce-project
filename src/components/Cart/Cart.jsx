@@ -14,6 +14,9 @@ class Cart extends React.Component {
     super(props);
     this.slideNum = 0;
   }
+  componentDidMount(){
+    closeMenues()
+  }
   moveSlider(id, right) {
     const slider = document.getElementById(id);
 
