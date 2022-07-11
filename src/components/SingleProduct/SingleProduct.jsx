@@ -3,9 +3,14 @@ import "./SingleProduct.css";
 import { withRouter } from "./withRouter";
 import { connect } from "react-redux";
 import Attributes from "../Attributes";
-import { showCart,closeMenues } from "../../Redux/CommonFunctions";
+import { showCart, closeMenues } from "../../Redux/CommonFunctions";
+import { GET_PRODUCT } from "../../GraphQl/Queries";
+import { withApollo } from "@apollo/client/react/hoc";
 
 class SingleProduct extends React.Component {
+  state = {
+    loading: false,
+  };
   changeMainImg(e) {
     const newImg = e.target.src;
     e.target.src = document.querySelector(".main__img img").src;
@@ -15,16 +20,73 @@ class SingleProduct extends React.Component {
     return new DOMParser().parseFromString(html, "text/html").documentElement
       .textContent;
   }
+  componentDidMount() {
+    showCart();
+    this.runQuery();
+  }
+  runQuery() {
+    const {
+      client,
+      setProduct,
+      params: { id },
+    } = this.props;
+    this.setState({ loading: true });
+    client
+      .query({
+        query: GET_PRODUCT,
+        variables: { id },
+      })
+      .then((result) => {
+        const {
+          data: { product },
+        } = result;
+
+        this.setState({ loading: false });
+        setProduct(product);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  removeSelectedClass() {
+    Array.from(document.querySelectorAll(".single__product .attr")).forEach(
+      (a) => {
+        a.classList.remove("selected");
+      }
+    );
+    Array.from(document.querySelectorAll(".single__product .size")).forEach(
+      (a) => {
+        a.classList.remove("selected");
+      }
+    );
+    Array.from(document.querySelectorAll(".single__product .color")).forEach(
+      (a) => {
+        a.classList.remove("selected");
+      }
+    );
+  }
   render() {
-    const id = this.props.params.id;
-    let product = this.props.products.find((pro) => pro.id === id);
-    if (this.props.location.pathname.includes("cart")) {
-      product = this.props.cartProducts.find((pro) => pro.id == id);
+    const {
+      params: { id },
+      cartProducts,
+      addedProduct,
+      addToCart,
+      location: { pathname },
+    } = this.props;
+    let product = this.props.singleProduct;
+    if (pathname.includes("cart")) {
+      product = cartProducts.find((pro) => pro.id === id);
+    }
+
+    if (this.state.loading) {
+      return <h1 className="center mt-5">Loading...</h1>;
     }
     return product ? (
       <section
         className={`${
-          product.inStock ? "single__product" : "single__product out-of-stock after"
+          product.inStock
+            ? "single__product"
+            : "single__product out-of-stock after"
         }`}
         onClick={closeMenues}
       >
@@ -61,12 +123,24 @@ class SingleProduct extends React.Component {
             <button
               className="main__btn"
               onClick={() => {
-                showCart();
-                if (this.props.addedProduct.isAttributesChanged) {
-                  console.log(this.props.addedProduct, "hhhhhh");
-                  this.props.addToCart(this.props.addedProduct);
-                } else {
-                  this.props.addToCart(product);
+                const { isAttributesChanged, attributes } = addedProduct;
+                if (isAttributesChanged) {
+                  let isAttributesChecked = false;
+
+                  for (let i in attributes) {
+                    for (let j of attributes[i].items) {
+                      if (j.selected === undefined) {
+                        isAttributesChecked = false;
+                        break;
+                      } else {
+                        isAttributesChecked = true;
+                      }
+                    }
+                  }
+                  if (isAttributesChecked) {
+                    addToCart(this.props.addedProduct);
+                    this.removeSelectedClass();
+                  }
                 }
               }}
             >
@@ -75,14 +149,15 @@ class SingleProduct extends React.Component {
           ) : (
             ""
           )}
-          
-          <div className="desc" dangerouslySetInnerHTML={{ __html: product.description }}></div>
+
+          <div
+            className="desc"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          ></div>
         </div>
       </section>
     ) : (
-      <p className="center" style={{ marginTop: "5rem" }}>
-        Error , Please Try again.{" "}
-      </p>
+      <p className="center mt-5">Error , Please Try again. </p>
     );
   }
 }
@@ -91,17 +166,20 @@ const mapStateToProps = (state) => {
     products: state.products,
     cartProducts: state.cartProducts,
     addedProduct: state.addedProduct,
+    singleProduct: state.singleProduct,
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return {
     addToCart: (product) => {
-      dispatch({ type: "ADD_TO_CART", payload: product });
+      dispatch({ type: "ADD_TO_CART", payload: { single: true, product } });
+    },
+    setProduct: (product) => {
+      dispatch({ type: "SET_SINGLE_PRODUCT", payload: product });
     },
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(SingleProduct));
+export default withApollo(
+  connect(mapStateToProps, mapDispatchToProps)(withRouter(SingleProduct))
+);

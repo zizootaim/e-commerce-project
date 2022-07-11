@@ -2,10 +2,12 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { closeMenues } from "../Redux/CommonFunctions";
+import { withRouter } from "./SingleProduct/withRouter";
 
 class Home extends React.Component {
   render() {
     const { currentCategory, filteredProducts, addToCart } = this.props;
+
     return (
       <section className="home" id="home" onClick={closeMenues}>
         <div className="cat__name">
@@ -17,21 +19,27 @@ class Home extends React.Component {
               return (
                 <div
                   className={`${
-                    p.inStock ? "product" : "product out-of-stock after"
+                    p.inStock ? "product" : "product out-of-stock"
                   }`}
                   key={index}
                 >
                   <Link to={`SingleProduct/${p.id}`}>
                     <div className="product__img center">
+                      {!p.inStock ? (
+                        <span className="out-stock">out of stock</span>
+                      ) : (
+                        ""
+                      )}
                       <img src={p.gallery[0]} alt="img" />
                     </div>
                   </Link>
                   <div className="product__data">
-                    <p className="name">
+                    <span className="name">
                       {p.name} {p.brand}
-                    </p>
+                    </span>
                     <div className="price">{p.price}</div>
                   </div>
+
                   <div
                     className="add__to__cart__icon center"
                     onClick={() => {
@@ -63,13 +71,14 @@ class Home extends React.Component {
               );
             })
           ) : (
-            <h1 className="center">Error 404, Please Try again.</h1>
+            <h1 className="center mt-5">Error , Please Try again.</h1>
           )}
         </div>
       </section>
     );
   }
 }
+
 const mapStateToProps = (state) => {
   return {
     filteredProducts: state.filteredProducts,
@@ -80,9 +89,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     addToCart: (product) => {
-      dispatch({ type: "ADD_TO_CART", payload: product });
+      dispatch({ type: "ADD_TO_CART", payload: { single: false, product } });
     },
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Home));

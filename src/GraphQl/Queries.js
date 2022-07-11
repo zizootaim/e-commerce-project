@@ -48,3 +48,67 @@ export const GET_CURRENCIES = gql`
     }
   }
 `;
+
+export const GET_PRODUCT = gql`
+  query ($id: String!) {
+    product(id: $id) {
+      id
+      name
+      gallery
+      description
+      inStock
+      category
+      attributes {
+        id
+        name
+        type
+        items {
+          displayValue
+          value
+          id
+        }
+      }
+      prices {
+        currency {
+          label
+          symbol
+        }
+        amount
+      }
+      brand
+    }
+  }
+`;
+export const GET_PRODUCTS = gql`
+  query ($name: String!) {
+    category(input: { title: $name }) {
+      name
+      products {
+        id
+        name
+        gallery
+        description
+        inStock
+        category
+        attributes {
+          id
+          name
+          type
+          items {
+            displayValue
+            value
+            id
+          }
+        }
+        prices {
+          currency {
+            label
+            symbol
+          }
+          amount
+        }
+        brand
+      }
+    }
+  }
+`;

@@ -24,7 +24,7 @@ export const getQuantity = (arr) => {
     q += i.count;
   });
   return q;
-}
+};
 
 export const showCurrenciesList = () => {
   document.querySelector(".mini__cart").classList.remove("show");
@@ -32,23 +32,23 @@ export const showCurrenciesList = () => {
   let height = 0,
     iconDir = "";
   const icon = document.querySelector(".currencies__list__top i");
-  if (icon.className == "fas fa-angle-down") iconDir = "up";
+  if (icon.className === "fas fa-angle-down") iconDir = "up";
   else iconDir = "down";
   Array.from(document.querySelector(".currencies__list").children).forEach(
     (li) => {
       height += li.getBoundingClientRect().height;
     }
   );
-  if (iconDir == "down") height = 0;
+  if (iconDir === "down") height = 0;
 
   icon.className = `fas fa-angle-${iconDir}`;
   document.querySelector(".currencies__list").style.height = height + "px";
 };
 
 export const closeMenues = () => {
-
   document.querySelector(".mini__cart").classList.remove("show");
   document.body.classList.remove("overlay");
   document.querySelector(".currencies__list").style.height = "0px";
-  document.querySelector(".currencies__list__top i").className = "fas fa-angle-down"
-}
+  document.querySelector(".currencies__list__top i").className =
+    "fas fa-angle-down";
+};

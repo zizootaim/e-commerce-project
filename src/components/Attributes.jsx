@@ -5,7 +5,7 @@ class Attributes extends React.Component {
   render() {
     const chooseAttr = (e, attr, attrItem) => {
       const existed = this.props.cartProducts.find(
-        (p) => p.id == this.props.productID
+        (p) => p.id === this.props.productID
       )
         ? true
         : false;
@@ -21,7 +21,7 @@ class Attributes extends React.Component {
     return (
       <>
         {this.props.attributes.map((attr) => {
-          if (attr.id == "Size") {
+          if (attr.id === "Size") {
             return (
               <div key={attr.id}>
                 <p>Sizes:</p>
@@ -39,7 +39,7 @@ class Attributes extends React.Component {
               </div>
             );
           }
-          if (attr.id == "Color") {
+          if (attr.id === "Color") {
             return (
               <div key={attr.id}>
                 <p>Color:</p>
@@ -66,7 +66,6 @@ class Attributes extends React.Component {
                   <span
                     key={i.id}
                     className={`${i.selected ? "attr selected" : "attr"}`}
-                    style={{ marginRight: ".7rem" }}
                     onClick={(e) => chooseAttr(e, attr, i)}
                   >
                     {i.value}

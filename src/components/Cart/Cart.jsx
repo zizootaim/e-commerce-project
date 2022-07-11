@@ -2,16 +2,19 @@ import React from "react";
 import "./Cart.css";
 import { connect } from "react-redux";
 import Attributes from "../Attributes";
-import { getTotal,getQuantity,closeMenues } from "../../Redux/CommonFunctions";
+import {
+  getTotal,
+  getQuantity,
+  closeMenues,
+} from "../../Redux/CommonFunctions";
 import { Link } from "react-router-dom";
-
 
 class Cart extends React.Component {
   constructor(props) {
     super(props);
     this.slideNum = 0;
   }
-  moveSlider(e, id, right) {
+  moveSlider(id, right) {
     const slider = document.getElementById(id);
 
     const sliderLength = slider.querySelectorAll(".slide").length;
@@ -27,7 +30,7 @@ class Cart extends React.Component {
       this.slideNum * 200
     }px)`;
   }
-  
+
   render() {
     const { changeAmount, cartProducts, currentCurrency } = this.props;
     return (
@@ -43,35 +46,87 @@ class Cart extends React.Component {
                       <h3 className="item__title">{p.name}</h3>
                       <p>{p.brand}</p>
                       <div className="price">{p.price}</div>
-                      <Attributes attributes={p.attributes} productID={p.id} />
+                      <div className="attributes__container">
+                        <Attributes
+                          attributes={p.attributes}
+                          productID={p.id}
+                        />
+                      </div>
                     </div>
                     <div className="cart__item__amount flex">
                       <button
                         className="cart__btn"
                         onClick={() => changeAmount(p.id, "INC")}
                       >
-                        <i className="fas fa-plus"></i>
+                        <div className="plus">
+                          <svg
+                            width="1"
+                            height="17"
+                            viewBox="0 0 1 17"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M0.5 1V16" stroke="#1D1F22" />
+                          </svg>
+                          <svg
+                            width="17"
+                            height="1"
+                            viewBox="0 0 17 1"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M1 0.5H16" stroke="black" />
+                          </svg>
+                        </div>
                       </button>
                       <span>{p.count}</span>
                       <button
                         className="cart__btn"
                         onClick={() => changeAmount(p.id, "DEC")}
                       >
-                        <i className="fas fa-minus"></i>
+                        <div className="minus">
+                          <svg
+                            width="17"
+                            height="1"
+                            viewBox="0 0 17 1"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M1 0.5H16" stroke="black" />
+                          </svg>
+                        </div>
                       </button>
                     </div>
                     <div className="item__slider" id={p.id}>
                       {p.gallery.length > 1 ? (
                         <div className="slide__btns">
-                          <button
-                            onClick={(e) => this.moveSlider(e, p.id, false)}
-                          >
-                            <i className="fas fa-angle-left"></i>
+                          <button onClick={() => this.moveSlider(p.id, false)}>
+                            <svg
+                              width="8"
+                              height="14"
+                              viewBox="0 0 8 14"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M7.25 1.06857L1.625 6.6876L7.25 12.3066"
+                                stroke="white"
+                              />
+                            </svg>
                           </button>
-                          <button
-                            onClick={(e) => this.moveSlider(e, p.id, true)}
-                          >
-                            <i className="fas fa-angle-right"></i>
+                          <button onClick={() => this.moveSlider(p.id, true)}>
+                            <svg
+                              width="8"
+                              height="14"
+                              viewBox="0 0 8 14"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M0.75 1.06857L6.375 6.6876L0.75 12.3066"
+                                stroke="white"
+                              />
+                            </svg>
                           </button>
                         </div>
                       ) : (
@@ -83,11 +138,11 @@ class Cart extends React.Component {
                           return (
                             <div className="slide" key={index}>
                               <Link to={`/cart/SingleProduct/${p.id}`}>
-                              <img
-                                src={img}
-                                alt="pro"
-                                style={{ cursor: "pointer" }}
-                              />
+                                <img
+                                  src={img}
+                                  alt="pro"
+                                 
+                                />
                               </Link>
                             </div>
                           );
@@ -102,7 +157,9 @@ class Cart extends React.Component {
               <div>
                 <p>Tax 21%:</p>
                 <span className="price">
-                  {currentCurrency.symbol + " " + getTotal(cartProducts).tax.toFixed(2)}
+                  {currentCurrency.symbol +
+                    " " +
+                    getTotal(cartProducts).tax.toFixed(2)}
                 </span>
               </div>
               <div>
@@ -112,7 +169,9 @@ class Cart extends React.Component {
               <div>
                 <p>Total:</p>
                 <span className="price">
-                  {currentCurrency.symbol + " " + getTotal(cartProducts).total.toFixed(2)}
+                  {currentCurrency.symbol +
+                    " " +
+                    getTotal(cartProducts).total.toFixed(2)}
                 </span>
               </div>
               <button className="main__btn">order</button>

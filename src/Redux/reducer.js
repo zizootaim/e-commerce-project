@@ -1,139 +1,193 @@
 const initialState = {
-  products: [],
   filteredProducts: [],
   categories: [],
+  currencies: [],
   currentCategory: "all",
-  singleProductID: "",
   currentCurrency: {
     label: "USD",
     symbol: "$",
   },
   cartProducts: [],
   addedProduct: {},
+  singleProduct: "",
 };
-const FETCH_DATA = "FETCH_DATA";
+const SET_DATA = "SET_DATA";
+const SET_PRODUCTS = "SET_PRODUCTS";
 const ADD_TO_CART = "ADD_TO_CART";
 const CHANGE_ATTRIBUTES = "CHANGE_ATTRIBUTES";
 const CHANGE_AMOUNT = "CHANGE_AMOUNT";
 const CHANGE_CURRENCY = "CHANGE_CURRENCY";
 const FILTER__PRODUCTS = "FILTER__PRODUCTS";
-const ADD_PROD = "ADD_PROD";
+const SET_SINGLE_PRODUCT = "SET_SINGLE_PRODUCT";
 
 const extractNumber = (str) => {
-  var regex = /[+-]?\d+(\.\d+)?/g;
-  var floats = str.match(regex).map(function (v) {
+  const regex = /[+-]?\d+(\.\d+)?/g;
+  const floats = str.match(regex).map(function (v) {
     return parseFloat(v);
   })[0];
   return floats;
 };
 const changeProductsPrices = (arr, currentCurrency) => {
   return arr.map((p) => {
-    const c = p.prices.find((p) => {
-      return p.currency.label == currentCurrency.label;
-    });
-    let price = c.currency.symbol + c.amount,
-      total = "";
-    if (p.price) {
-      total = extractNumber(price) * p.count;
+    if (p) {
+      const c = p.prices.find((p) => {
+        return p.currency.label === currentCurrency.label;
+      });
+      let price = c.currency.symbol + c.amount,
+        total = "";
+      if (p.price) {
+        total = extractNumber(price) * p.count;
+      }
+      return { ...p, price: price, total: total };
     }
-    return { ...p, price: price, total: total };
+    return p;
   });
 };
 
+const checkSameItems = (arr) => {
+  if (arr.length > 1) {
+    const newItem = arr[arr.length - 1];
+
+    const prevItems = arr.filter(
+      (p) => p.prevID === newItem.prevID && p.id !== newItem.id
+    );
+    let newArr = arr;
+    prevItems.forEach((prevItem) => {
+      if (prevItem && newItem.prevID === prevItem.prevID) {
+        const prevAttr = prevItem.attributes.map((attr) => {
+          return {
+            id: attr.id,
+            selectedItem: attr.items.filter((i) => i.selected === true)[0],
+          };
+        });
+        const newAttr = newItem.attributes.map((attr) => {
+          return {
+            id: attr.id,
+            selectedItem: attr.items.filter((i) => i.selected === true)[0],
+          };
+        });
+        let sameNum = 0;
+        prevAttr.forEach((p) => {
+          newAttr.forEach((n) => {
+            if (
+              p.id === n.id &&
+              p.selectedItem.value === n.selectedItem.value
+            ) {
+              sameNum++;
+            }
+          });
+        });
+        if (sameNum === prevAttr.length) {
+          newArr = arr
+            .map((p) => {
+              if (p.id === prevItem.id) {
+                return { ...p, count: ++p.count };
+              }
+              return { ...p };
+            })
+            .filter((p) => p.id !== newItem.id);
+        }
+      }
+    });
+    return newArr;
+  }
+  return arr;
+};
 const reducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
-    case FETCH_DATA: {
-      const categories = payload.map((c) => c.name);
-      let allProducts = [];
-      payload.forEach((c) => {
-        allProducts = [...allProducts, ...c.products].map((p) => {
-          return { ...p, isAttributesChanged: false };
-        });
-      });
-
-      allProducts = changeProductsPrices(allProducts, state.currentCurrency);
+    case SET_PRODUCTS: {
+      return {
+        ...state,
+        filteredProducts: changeProductsPrices(payload, state.currentCurrency),
+      };
+    }
+    case SET_SINGLE_PRODUCT: {
+      const p = changeProductsPrices([payload], state.currentCurrency);
+      return {
+        ...state,
+        singleProduct: p[0],
+      };
+    }
+    case SET_DATA: {
+      const { categories, currencies } = payload;
 
       return {
         ...state,
         categories,
-        products: allProducts,
-        filteredProducts: allProducts,
+        currencies,
       };
     }
     case FILTER__PRODUCTS: {
-      let newProducts = changeProductsPrices(
-        state.products,
-        state.currentCurrency
-      ).filter((p) => p.category === payload);
-      if (payload == "all")
-        newProducts = changeProductsPrices(
-          state.products,
-          state.currentCurrency
-        );
       return {
         ...state,
         currentCategory: payload,
-        filteredProducts: newProducts,
       };
     }
     case CHANGE_CURRENCY: {
       return {
         ...state,
-        products: changeProductsPrices(state.products, payload),
+        currentCurrency: payload,
         filteredProducts: changeProductsPrices(state.filteredProducts, payload),
         cartProducts: changeProductsPrices(state.cartProducts, payload),
-        currentCurrency: payload,
+        singleProduct: changeProductsPrices([state.singleProduct], payload)[0],
       };
     }
     case ADD_TO_CART: {
-      const old = state.cartProducts.filter(
-        (p) => p.prevID == payload.id || p.prevID == payload.id
-      );
-      if (old[old.length - 1] && !old[old.length - 1].isAttributesChanged)
-        return state;
-      let newItem = { ...payload };
-      if (!payload.inCart) {
-        if (!payload.isAttributesChanged) {
-          payload.attributes = payload.attributes.map((attr) => {
-            const newItems = attr.items.map((i, index) => {
-              if (index == 0) {
-                return { ...i, selected: true };
-              }
-              return i;
-            });
-            return { ...attr, items: newItems };
+      const { product, single } = payload;
+      let newItem = {};
+      if (single) {
+        if (state.addedProduct.id) newItem = state.addedProduct;
+        else newItem = state.singleProduct;
+      } else {
+        newItem = product;
+      }
+      if (!newItem.isAttributesChanged) {
+        newItem.attributes = newItem.attributes.map((attr) => {
+          const newItems = attr.items.map((i, index) => {
+            if (index === 0) {
+              return { ...i, selected: true };
+            }
+            return i;
           });
-        }
+          return { ...attr, items: newItems };
+        });
+      }
+      const old = state.cartProducts.filter((p) => p.prevID === product.id);
 
-        newItem = {
-          ...payload,
-          id: payload.id + Math.random(),
-          prevID: payload.id,
-        };
+      if (
+        old[old.length - 1] &&
+        !old[old.length - 1].isAttributesChanged &&
+        !newItem.isAttributesChanged
+      ) {
+        return state;
       }
 
       const newCartProducts = [...state.cartProducts, newItem].map((p) => {
-        console.log("hello", p);
-        return {
-          ...p,
-          inCart: true,
-          count: 1,
-          total: extractNumber(p.price),
-        };
+        if (p.id === newItem.id) {
+          return {
+            ...p,
+            id: p.id + Math.random(),
+            prevID: p.id,
+            inCart: true,
+            count: 1,
+            total: extractNumber(p.price),
+          };
+        }
+        return p;
       });
+
       return {
         ...state,
-        cartProducts: newCartProducts,
+        cartProducts: checkSameItems(newCartProducts),
         addedProduct: {},
       };
     }
     case CHANGE_AMOUNT: {
-      console.log(state.cartProducts);
       const newCartProducts = state.cartProducts
         .map((pro) => {
           if (pro.id === payload.id) {
-            if (payload.operation == "INC") pro.count++;
+            if (payload.operation === "INC") pro.count++;
             else pro.count--;
           }
 
@@ -149,71 +203,69 @@ const reducer = (state = initialState, action) => {
       };
     }
     case CHANGE_ATTRIBUTES: {
-      const existed = state.cartProducts.find((p) => p.id == payload.productID)
-        ? true
-        : false;
-      if (!existed) {
-        let newPro = state.products.find((p) => p.id == payload.productID);
-        if (state.addedProduct.isAttributesChanged) {
-          newPro = state.addedProduct;
-        }
-        console.log(newPro);
-        let attributes = newPro.attributes.map((a) => {
-          if (a.id == payload.attr.id) {
-            const newItems = a.items.map((i) => {
-              let selected = false;
+      const { productID, attrItem, attr } = payload;
+      const cartProduct = state.cartProducts.find((p) => p.id === productID);
 
-              if (i.id == payload.attrItem.id) selected = true;
-              return { ...i, selected };
+      if (cartProduct) {
+        const newCartProducts = state.cartProducts.map((p) => {
+          if (p.id === productID) {
+            const newAttributes = p.attributes.map((a) => {
+              if (a.id === attr.id) {
+                const newItems = a.items.map((i) => {
+                  let selected = false;
+
+                  if (i.id === attrItem.id) selected = true;
+                  return { ...i, selected };
+                });
+                return { ...a, items: newItems };
+              }
+              return a;
             });
-            return { ...a, items: newItems };
+            return {
+              ...p,
+              isAttributesChanged: true,
+              attributes: newAttributes,
+            };
           }
-          return a;
+          return p;
         });
-        console.log(newPro.attributes);
+
         return {
           ...state,
-          addedProduct: {
-            ...newPro,
-            attributes,
-            isAttributesChanged: true,
-          },
+          cartProducts: changeProductsPrices(
+            newCartProducts,
+            state.currentCurrency
+          ),
         };
       }
-      const newCartProducts = state.cartProducts.map((pro) => {
-        if (pro.id === payload.productID) {
-          let attributes = pro.attributes.map((a) => {
-            if (a.id == payload.attr.id) {
-              const newItems = a.items.map((i) => {
-                let selected = false;
+      const currentPro = state.addedProduct.id
+        ? state.addedProduct
+        : state.singleProduct;
+      const attributes = currentPro.attributes.map((a) => {
+        if (a.id === attr.id) {
+          const newItems = a.items.map((i) => {
+            let selected = false;
 
-                if (i.id == payload.attrItem.id) selected = true;
-                return { ...i, selected };
-              });
-              return { ...a, items: newItems };
-            }
-            return a;
+            if (i.id === attrItem.id) selected = true;
+            return { ...i, selected };
           });
-
-          return {
-            ...pro,
-            attributes,
-            isAttributesChanged: true,
-          };
+          return { ...a, items: newItems };
         }
-        return pro;
+        return a;
       });
-      console.log(newCartProducts);
+
       return {
         ...state,
-        cartProducts: changeProductsPrices(
-          newCartProducts,
-          state.currentCurrency
-        ),
+        addedProduct: {
+          ...state.singleProduct,
+          attributes,
+          isAttributesChanged: true,
+        },
       };
     }
+    default:
+      return state;
   }
-  return state;
 };
 
 export default reducer;
