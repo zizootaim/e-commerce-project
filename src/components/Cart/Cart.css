@@ -40,7 +40,7 @@
 .slide__btns button .fas {
   font-size: 18px;
 }
-.slide img{
+.slide img {
   cursor: pointer;
 }
 .slides {
@@ -50,10 +50,15 @@
   transition: 0.4s;
 }
 
-.slide img {
-  max-width: unset;
+.slide {
   width: 200px;
   height: 200px;
+}
+.slide img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  max-width: unset;
   max-height: unset;
 }
 

@@ -139,7 +139,7 @@ class Cart extends React.Component {
                       <div className="slides">
                         {p.gallery.map((img, index) => {
                           return (
-                            <div className="slide" key={index}>
+                            <div className="slide center" key={index}>
                               <Link to={`/cart/SingleProduct/${p.id}`}>
                                 <img
                                   src={img}
