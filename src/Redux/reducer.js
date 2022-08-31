@@ -28,20 +28,22 @@ const extractNumber = (str) => {
   return floats;
 };
 const changeProductsPrices = (arr, currentCurrency) => {
-  return arr.map((p) => {
-    if (p) {
-      const c = p.prices.find((p) => {
-        return p.currency.label === currentCurrency.label;
-      });
-      let price = c.currency.symbol + c.amount,
-        total = "";
-      if (p.price) {
-        total = extractNumber(price) * p.count;
+  return checkSameItems(
+    arr.map((p) => {
+      if (p) {
+        const c = p.prices.find((p) => {
+          return p.currency.label === currentCurrency.label;
+        });
+        let price = c.currency.symbol + c.amount,
+          total = "";
+        if (p.price) {
+          total = extractNumber(price) * p.count;
+        }
+        return { ...p, price: price, total: total };
       }
-      return { ...p, price: price, total: total };
-    }
-    return p;
-  });
+      return p;
+    })
+  );
 };
 
 const checkSameItems = (arr) => {
@@ -57,35 +59,31 @@ const checkSameItems = (arr) => {
         const prevAttr = prevItem.attributes.map((attr) => {
           return {
             id: attr.id,
-            selectedItem: attr.items.filter((i) => i.selected === true)[0],
+            selectedItem: attr.items.filter((i) => i.selected)[0],
           };
         });
         const newAttr = newItem.attributes.map((attr) => {
           return {
             id: attr.id,
-            selectedItem: attr.items.filter((i) => i.selected === true)[0],
+            selectedItem: attr.items.filter((i) => i.selected)[0],
           };
         });
         let sameNum = 0;
         prevAttr.forEach((p) => {
           newAttr.forEach((n) => {
-            if (
-              p.id === n.id &&
-              p.selectedItem.value === n.selectedItem.value
-            ) {
+            if (p.id === n.id && p.selectedItem.value === n.selectedItem.value)
               sameNum++;
-            }
           });
         });
         if (sameNum === prevAttr.length) {
           newArr = arr
+            .filter((p) => p.id !== newItem.id)
             .map((p) => {
               if (p.id === prevItem.id) {
-                return { ...p, count: ++p.count };
+                return { ...p, count: ++p.count, id: newItem.id };
               }
               return { ...p };
-            })
-            .filter((p) => p.id !== newItem.id);
+            });
         }
       }
     });
@@ -111,7 +109,6 @@ const reducer = (state = initialState, action) => {
     }
     case SET_DATA: {
       const { categories, currencies } = payload;
-
       return {
         ...state,
         categories,
@@ -139,9 +136,8 @@ const reducer = (state = initialState, action) => {
       if (single) {
         if (state.addedProduct.id) newItem = state.addedProduct;
         else newItem = state.singleProduct;
-      } else {
-        newItem = product;
-      }
+      } else newItem = product;
+
       if (!newItem.isAttributesChanged) {
         newItem.attributes = newItem.attributes.map((attr) => {
           const newItems = attr.items.map((i, index) => {
@@ -152,15 +148,6 @@ const reducer = (state = initialState, action) => {
           });
           return { ...attr, items: newItems };
         });
-      }
-      const old = state.cartProducts.filter((p) => p.prevID === product.id);
-
-      if (
-        old[old.length - 1] &&
-        !old[old.length - 1].isAttributesChanged &&
-        !newItem.isAttributesChanged
-      ) {
-        return state;
       }
 
       const newCartProducts = [...state.cartProducts, newItem].map((p) => {

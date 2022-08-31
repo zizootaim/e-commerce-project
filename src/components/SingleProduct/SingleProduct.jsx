@@ -3,7 +3,7 @@ import "./SingleProduct.css";
 import { withRouter } from "./withRouter";
 import { connect } from "react-redux";
 import Attributes from "../Attributes";
-import {  closeMenues } from "../../Redux/CommonFunctions";
+import { closeMenues } from "../../Redux/CommonFunctions";
 import { GET_PRODUCT } from "../../GraphQl/Queries";
 import { withApollo } from "@apollo/client/react/hoc";
 
@@ -21,7 +21,7 @@ class SingleProduct extends React.Component {
       .textContent;
   }
   componentDidMount() {
-    closeMenues()
+    closeMenues();
     this.runQuery();
   }
   runQuery() {
@@ -76,6 +76,7 @@ class SingleProduct extends React.Component {
     let product = this.props.singleProduct;
     if (pathname.includes("cart")) {
       product = cartProducts.find((pro) => pro.id === id);
+      console.log(cartProducts);
     }
 
     if (this.state.loading) {
