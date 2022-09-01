@@ -74,10 +74,8 @@ class SingleProduct extends React.Component {
       location: { pathname },
     } = this.props;
     let product = this.props.singleProduct;
-    if (pathname.includes("cart")) {
+    if (pathname.includes("cart"))
       product = cartProducts.find((pro) => pro.id === id);
-      console.log(cartProducts);
-    }
 
     if (this.state.loading) {
       return <h1 className="center mt-5">Loading...</h1>;
