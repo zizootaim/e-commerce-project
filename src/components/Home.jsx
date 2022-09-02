@@ -7,7 +7,6 @@ import { withRouter } from "./SingleProduct/withRouter";
 class Home extends React.Component {
   render() {
     const { currentCategory, filteredProducts, addToCart } = this.props;
-console.log(filteredProducts);
     return (
       <section className="home" id="home" onClick={closeMenues}>
         <div className="cat__name">
