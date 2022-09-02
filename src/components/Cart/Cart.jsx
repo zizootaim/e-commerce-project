@@ -162,7 +162,7 @@ class Cart extends React.Component {
                 <span className="price">
                   {currentCurrency.symbol +
                     " " +
-                    getTotal(cartProducts).tax.toFixed(2)}
+                    getTotal(cartProducts).tax}
                 </span>
               </div>
               <div>
@@ -174,7 +174,7 @@ class Cart extends React.Component {
                 <span className="price">
                   {currentCurrency.symbol +
                     " " +
-                    getTotal(cartProducts).total.toFixed(2)}
+                    getTotal(cartProducts).total}
                 </span>
               </div>
               <button className="main__btn">order</button>

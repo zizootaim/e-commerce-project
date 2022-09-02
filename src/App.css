@@ -31,7 +31,7 @@ body {
 .overlay section.after::before {
   top: 0;
 }
-ul {
+ul:not(.desc ul) {
   list-style: none;
 }
 img {
@@ -272,8 +272,14 @@ nav {
   margin-right: 0.5rem;
   cursor: pointer;
 }
+.border{
+  border: 1px solid #000;
+}
 .color.selected {
   box-shadow: 0 0 5px 1.5px var(--main-color);
+}
+.color.border.selected{
+  border: none;
 }
 .item .cart__btn .plus svg:nth-child(2),
 .item .cart__btn .minus svg:first-of-type {
@@ -366,6 +372,7 @@ section {
   bottom: -10rem;
   left: 800%;
 }
+
 .add__to__cart__icon:hover {
   background: #31bb56;
 }

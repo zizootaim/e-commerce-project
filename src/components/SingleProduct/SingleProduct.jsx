@@ -6,6 +6,7 @@ import Attributes from "../Attributes";
 import { closeMenues } from "../../Redux/CommonFunctions";
 import { GET_PRODUCT } from "../../GraphQl/Queries";
 import { withApollo } from "@apollo/client/react/hoc";
+import parse from 'html-react-parser';
 
 class SingleProduct extends React.Component {
   state = {
@@ -65,6 +66,7 @@ class SingleProduct extends React.Component {
       }
     );
   }
+
   render() {
     const {
       params: { id },
@@ -80,6 +82,7 @@ class SingleProduct extends React.Component {
     if (this.state.loading) {
       return <h1 className="center mt-5">Loading...</h1>;
     }
+
     return product ? (
       <section
         className={`${
@@ -149,10 +152,9 @@ class SingleProduct extends React.Component {
             ""
           )}
 
-          <div
-            className="desc"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          ></div>
+          <div className="desc">
+            {parse(product.description)}
+          </div>
         </div>
       </section>
     ) : (

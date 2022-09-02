@@ -34,12 +34,12 @@ const changeProductsPrices = (arr, currentCurrency) => {
         const c = p.prices.find((p) => {
           return p.currency.label === currentCurrency.label;
         });
-        let price = c.currency.symbol + c.amount,
+        let price = c.currency.symbol + c.amount.toFixed(2),
           total = "";
         if (p.price) {
-          total = extractNumber(price) * p.count;
+          total = Number(extractNumber(price) * p.count).toFixed(2);
         }
-        return { ...p, price: price, total: total };
+        return { ...p, price: price, total };
       }
       return p;
     })
@@ -71,7 +71,12 @@ const checkSameItems = (arr) => {
         let sameNum = 0;
         prevAttr.forEach((p) => {
           newAttr.forEach((n) => {
-            if (p.id === n.id && p.selectedItem.value === n.selectedItem.value)
+            const isExisted = p.selectedItem && n.selectedItem;
+            if (
+              isExisted &&
+              p.id === n.id &&
+              p.selectedItem.value === n.selectedItem.value
+            )
               sameNum++;
           });
         });

@@ -9,13 +9,12 @@ export const showCart = () => {
 };
 
 export const getTotal = (arr) => {
-  let t = 0;
+  let t = "";
   arr.forEach((p) => {
     t += p.total;
   });
-  const tax = t * (21 / 100);
-
-  return { total: t, tax };
+  const tax = (t * (21 / 100)).toFixed(2);
+  return { total: Number(t).toFixed(2), tax };
 };
 
 export const getQuantity = (arr) => {
@@ -52,3 +51,4 @@ export const closeMenues = () => {
   document.querySelector(".currencies__list__top i").className =
     "fas fa-angle-down";
 };
+

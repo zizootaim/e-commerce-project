@@ -47,6 +47,7 @@ class Navbar extends React.Component {
             category: { products },
           },
         } = result;
+        
         setProducts(products);
       })
       .catch((err) => {
@@ -149,6 +150,7 @@ class Navbar extends React.Component {
                     <h4>My Bag {getQuantity(cartProducts)} items</h4>
                     <div className="cart__items flex">
                       {cartProducts.map((p) => {
+                       
                         return (
                           <div className="cart__item" key={p.id}>
                             <div className="cart__item__data flex">
@@ -157,7 +159,7 @@ class Navbar extends React.Component {
                               <span className="price">
                                 {currentCurrency.symbol +
                                   " " +
-                                  p.total.toFixed(2)}
+                                  p.total}
                               </span>
                               <div className="attributes__container">
                                 <Attributes
@@ -192,11 +194,11 @@ class Navbar extends React.Component {
                     </div>
                     <div className="mini__cart__bottom flex">
                       <h3>
-                        Total:{" "}
+                        Total:
                         <span>
                           {currentCurrency.symbol +
                             " " +
-                            getTotal(this.props.cartProducts).total.toFixed(2)}
+                            getTotal(this.props.cartProducts).total}
                         </span>
                       </h3>
                       <div className="cart__bottom__btns flex">

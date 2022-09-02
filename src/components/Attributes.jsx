@@ -48,7 +48,10 @@ class Attributes extends React.Component {
                     return (
                       <span
                         key={index}
-                        className={`${c.selected ? "color selected" : "color"}`}
+                        className={`${
+                          (c.id === "White" ? "border " : "") +
+                          (c.selected ? "color selected" : "color")
+                        }`}
                         style={{ backgroundColor: c.value }}
                         onClick={(e) => chooseAttr(e, attr, c)}
                       ></span>
